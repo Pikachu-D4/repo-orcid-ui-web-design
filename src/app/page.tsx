@@ -1,16 +1,22 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AnimatePresence,
   motion,
   useScroll,
   useTransform,
-  useMotionValue,
-  useSpring,
   animate,
 } from "framer-motion";
 import { ArrowUpRight, Mail, Play, Sparkles, X, ChevronRight } from "lucide-react";
+import TiltCard from "@/components/animations/TiltCard";
+import SmoothScrollProvider from "@/components/animations/SmoothScrollProvider";
+
+const HeroFloatingObject = dynamic(() => import("@/components/3d/HeroFloatingObject"), {
+  ssr: false,
+  loading: () => <div className="hero-orb-loading" aria-hidden="true" />,
+});
 
 type Project = {
   id: number;
@@ -162,41 +168,6 @@ function useCounter(target: number, inView: boolean) {
   return count;
 }
 
-// 3D tilt card
-function TiltCard({ children, className }: { children: React.ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const rotateX = useMotionValue(0);
-  const rotateY = useMotionValue(0);
-  const springX = useSpring(rotateX, { stiffness: 200, damping: 20 });
-  const springY = useSpring(rotateY, { stiffness: 200, damping: 20 });
-
-  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    rotateX.set(-y * 10);
-    rotateY.set(x * 10);
-  };
-
-  const handleLeave = () => {
-    rotateX.set(0);
-    rotateY.set(0);
-  };
-
-  return (
-    <motion.div
-      ref={ref}
-      className={className}
-      style={{ rotateX: springX, rotateY: springY, transformPerspective: 1000 }}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
 // Stat counter card
 function StatCard({ stat }: { stat: typeof stats[0] }) {
   const [inView, setInView] = useState(false);
@@ -281,7 +252,8 @@ export default function Home() {
   };
 
   return (
-    <main className="portfolio-page">
+    <SmoothScrollProvider>
+      <main className="portfolio-page">
       {/* Scroll progress bar */}
       <motion.div className="scroll-progress" style={{ width: progressBar }} />
 
@@ -401,6 +373,15 @@ export default function Home() {
           </motion.div>
         </motion.div>
 
+        <motion.div
+          className="hero-orb-shell"
+          initial={{ opacity: 0, x: 36 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.9, delay: 0.45 }}
+        >
+          <HeroFloatingObject />
+        </motion.div>
+
         {/* Hero floating cards */}
         <motion.div
           className="hero-float-card hero-float-card-1"
@@ -476,7 +457,7 @@ export default function Home() {
           <div className="portfolio-grid">
             {filtered.map((project, idx) => (
               <motion.article
-                className="project-card"
+                className="project-card project-card-glow"
                 key={project.id}
                 layout
                 initial={{ opacity: 0, y: 40 }}
@@ -565,6 +546,7 @@ export default function Home() {
                   src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80"
                   alt="Creative freelancer portrait"
                   className="about-avatar"
+                  loading="lazy"
                 />
               </div>
               <div className="about-card-badges">
@@ -618,16 +600,17 @@ export default function Home() {
           {processSteps.map((step, idx) => (
             <motion.div
               key={step.num}
-              className="process-card"
               initial={{ opacity: 0, y: 36 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
             >
-              <span className="process-num">{step.num}</span>
-              <h3 className="process-title">{step.title}</h3>
-              <p className="process-desc">{step.desc}</p>
-              {idx < processSteps.length - 1 && <span className="process-connector" />}
+              <TiltCard className="process-card" maxTilt={6}>
+                <span className="process-num">{step.num}</span>
+                <h3 className="process-title">{step.title}</h3>
+                <p className="process-desc">{step.desc}</p>
+                {idx < processSteps.length - 1 && <span className="process-connector" />}
+              </TiltCard>
             </motion.div>
           ))}
         </div>
@@ -638,7 +621,7 @@ export default function Home() {
         <div className="reel-track">
           {[...projects, ...projects].map((p, i) => (
             <div key={i} className="reel-frame">
-              <img src={p.poster} alt={p.title} />
+              <img src={p.poster} alt={p.title} loading="lazy" decoding="async" />
             </div>
           ))}
         </div>
@@ -671,7 +654,7 @@ export default function Home() {
               </div>
               <p>&ldquo;{item.quote}&rdquo;</p>
               <footer>
-                <img src={item.avatar} alt={item.author} className="testimonial-avatar" />
+                <img src={item.avatar} alt={item.author} className="testimonial-avatar" loading="lazy" decoding="async" />
                 <div>
                   <strong>{item.author}</strong>
                   <span>{item.role}</span>
@@ -805,6 +788,7 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
-    </main>
+      </main>
+    </SmoothScrollProvider>
   );
 }
