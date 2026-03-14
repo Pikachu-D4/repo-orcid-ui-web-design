@@ -12,127 +12,12 @@ import {
 import { ArrowUpRight, Mail, Play, Sparkles, X, ChevronRight } from "lucide-react";
 import TiltCard from "@/components/animations/TiltCard";
 import SmoothScrollProvider from "@/components/animations/SmoothScrollProvider";
+import { loadSiteMediaContent, type Project } from "@/lib/site-content";
 
 const HeroFloatingObject = dynamic(() => import("@/components/3d/HeroFloatingObject"), {
   ssr: false,
   loading: () => <div className="hero-orb-loading" aria-hidden="true" />,
 });
-
-type Project = {
-  id: number;
-  title: string;
-  description: string;
-  category: string;
-  poster: string;
-  video: string;
-};
-
-const projects: Project[] = [
-  {
-    id: 1,
-    title: "Nebula Launch Film",
-    description: "Cinematic brand trailer built for a SaaS product launch.",
-    category: "Film",
-    poster: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
-    video: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    id: 2,
-    title: "Modern Creator Landing",
-    description: "Conversion-focused portfolio website for a digital creator.",
-    category: "Web",
-    poster: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=1200&q=80",
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    id: 3,
-    title: "Pulse Reels Campaign",
-    description: "Short-form vertical edits optimized for social engagement.",
-    category: "Social",
-    poster: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
-    video: "https://www.w3schools.com/html/movie.mp4",
-  },
-  {
-    id: 4,
-    title: "Aerial Story Sequence",
-    description: "Travel film cut with smooth transitions and color grading.",
-    category: "Film",
-    poster: "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&w=1200&q=80",
-    video: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    id: 5,
-    title: "Event Teaser Edit",
-    description: "Fast-paced teaser with motion typography and sound design.",
-    category: "Film",
-    poster: "https://images.unsplash.com/photo-1470229538611-16ba8c7ffbd7?auto=format&fit=crop&w=1200&q=80",
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    id: 6,
-    title: "Studio Identity Site",
-    description: "Minimal site experience with interactive visual storytelling.",
-    category: "Web",
-    poster: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&q=80",
-    video: "https://www.w3schools.com/html/movie.mp4",
-  },
-  {
-    id: 7,
-    title: "Luxury Product Edit",
-    description: "Premium product showcase using macro visuals and light FX.",
-    category: "Social",
-    poster: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
-    video: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-  {
-    id: 8,
-    title: "Creator Intro Film",
-    description: "Personal brand intro designed to increase booking inquiries.",
-    category: "Film",
-    poster: "https://images.unsplash.com/photo-1491897554428-130a60dd4757?auto=format&fit=crop&w=1200&q=80",
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
-  {
-    id: 9,
-    title: "Interactive Brand Page",
-    description: "Futuristic website with smooth sections and rich motion.",
-    category: "Web",
-    poster: "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?auto=format&fit=crop&w=1200&q=80",
-    video: "https://www.w3schools.com/html/movie.mp4",
-  },
-  {
-    id: 10,
-    title: "Social Story Edit Pack",
-    description: "Batch storytelling edits crafted for daily posting cadence.",
-    category: "Social",
-    poster: "https://images.unsplash.com/photo-1492724441997-5dc865305da7?auto=format&fit=crop&w=1200&q=80",
-    video: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  },
-];
-
-const testimonials = [
-  {
-    quote: "He made our brand look premium in both web and video. The final result converted immediately.",
-    author: "Samantha R.",
-    role: "Founder, Flux Atelier",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&q=80",
-    stars: 5,
-  },
-  {
-    quote: "Fast delivery, exceptional taste, and clean execution. Exactly the creative partner we needed.",
-    author: "Daniel K.",
-    role: "Marketing Lead, Nova Labs",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&q=80",
-    stars: 5,
-  },
-  {
-    quote: "Our launch video and landing page finally feel cohesive. Clients mention it on every call.",
-    author: "Amelia J.",
-    role: "Brand Strategist",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=80&q=80",
-    stars: 5,
-  },
-];
 
 const stats = [
   { label: "Projects Delivered", value: 130, suffix: "+" },
@@ -192,6 +77,7 @@ function StatCard({ stat }: { stat: typeof stats[0] }) {
 
 export default function Home() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [mediaContent, setMediaContent] = useState(() => loadSiteMediaContent());
   const [mouse, setMouse] = useState({ x: -200, y: -200 });
   const [filter, setFilter] = useState("All");
   const videoRefs = useRef<Record<number, HTMLVideoElement | null>>({});
@@ -217,7 +103,20 @@ export default function Home() {
   const allMarquee = [...marqueeItems, ...marqueeItems];
 
   const categories = ["All", "Film", "Web", "Social"];
-  const filtered = filter === "All" ? projects : projects.filter((p) => p.category === filter);
+  const filtered = filter === "All" ? mediaContent.projects : mediaContent.projects.filter((p) => p.category === filter);
+
+  useEffect(() => {
+    setMediaContent(loadSiteMediaContent());
+
+    const handleStorage = (event: StorageEvent) => {
+      if (!event.key || event.key === "orcid-ui-media-content") {
+        setMediaContent(loadSiteMediaContent());
+      }
+    };
+
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
 
   useEffect(() => {
     const handlePointer = (event: PointerEvent) => setMouse({ x: event.clientX, y: event.clientY });
@@ -619,7 +518,7 @@ export default function Home() {
       {/* ── REEL STRIP ── */}
       <div className="reel-strip">
         <div className="reel-track">
-          {[...projects, ...projects].map((p, i) => (
+          {[...mediaContent.projects, ...mediaContent.projects].map((p, i) => (
             <div key={i} className="reel-frame">
               <img src={p.poster} alt={p.title} loading="lazy" decoding="async" />
             </div>
@@ -640,7 +539,7 @@ export default function Home() {
           <h2>What Clients Say</h2>
         </motion.div>
         <div className="testimonials-grid">
-          {testimonials.map((item, idx) => (
+          {mediaContent.testimonials.map((item, idx) => (
             <motion.blockquote
               key={item.author}
               className="testimonial-card"
