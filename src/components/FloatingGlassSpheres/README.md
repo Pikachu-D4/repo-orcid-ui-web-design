@@ -18,6 +18,8 @@ Render once near the application shell/root layout, behind content:
 
 The root element is `position: fixed` and `pointer-events: none`, so normal interaction is unaffected.
 
+The entry component is a client component (`'use client'`) because it relies on runtime browser capability checks (`WebGL`, `matchMedia`, memory/CPU/network hints).
+
 ## Dependencies
 
 This feature expects:
@@ -33,6 +35,7 @@ If dynamic import fails (or WebGL is unsupported), the CSS fallback remains acti
 - Sphere count defaults to 5.
 - Geometry is low-poly (`icosahedronGeometry`, detail `2`).
 - Mobile/low-end devices use CSS fallback by default.
+- Suspense keeps the CSS fallback visible while the 3D chunk loads.
 
 
 ## React 19 Compatibility
