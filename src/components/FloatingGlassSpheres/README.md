@@ -23,7 +23,7 @@ The root element is `position: fixed` and `pointer-events: none`, so normal inte
 This feature expects:
 
 - `three`
-- `@react-three/fiber`
+- `@react-three/fiber` (use `^9.x` with React 19 projects)
 
 If dynamic import fails (or WebGL is unsupported), the CSS fallback remains active.
 
@@ -33,3 +33,8 @@ If dynamic import fails (or WebGL is unsupported), the CSS fallback remains acti
 - Sphere count defaults to 5.
 - Geometry is low-poly (`icosahedronGeometry`, detail `2`).
 - Mobile/low-end devices use CSS fallback by default.
+
+
+## React 19 Compatibility
+
+This repository currently uses `react@19`, so keep `@react-three/fiber` on the `9.x` major line to avoid peer dependency conflicts during install/deploy.

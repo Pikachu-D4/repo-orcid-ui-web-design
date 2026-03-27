@@ -4,6 +4,8 @@ import React, { useMemo, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
+// Note: this implementation expects @react-three/fiber v9+ for React 19 compatibility.
+
 type SphereConfig = {
   radius: number;
   base: THREE.Vector3;
